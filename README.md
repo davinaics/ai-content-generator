@@ -1,3 +1,3 @@
 # AI Content Generator
 
-Made by Davina Icasia Edria Putri🌻🌻
+Made by Davina dan Dovalina
