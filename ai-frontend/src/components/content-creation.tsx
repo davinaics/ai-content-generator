@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Copy, Download, RefreshCw, FileText } from "lucide-react";
 
 export function ContentCreation() {
@@ -25,7 +25,6 @@ export function ContentCreation() {
     length: "",
   });
 
-  // Pilihan konten dinamis
   const contentOptions: Record<string, string[]> = {
     "AI Education": [
       "Materi Pembelajaran",
@@ -47,7 +46,6 @@ export function ContentCreation() {
     ],
   };
 
-  // 🔹 Bersihin markdown dari hasil konten
   const cleanText = (text: string) => {
     return text
       .replace(/\*\*/g, "")
@@ -89,16 +87,15 @@ export function ContentCreation() {
       const content = cleanText(data.result || "Tidak ada hasil.");
       setGeneratedContent(content);
 
-      // 🔹 Simpan ke history biar langsung muncul di Riwayat
-      await fetch("http://localhost:8000/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          topic: formData.topic,
-          content,
-          created_at: new Date().toISOString(),
-        }),
-      });
+      // await fetch("http://localhost:8000/history", {
+      //  method: "POST",
+      //  headers: { "Content-Type": "application/json" },
+      //  body: JSON.stringify({
+      //   topic: formData.topic,
+      //    content,
+      //    created_at: new Date().toISOString(),
+      //  }),
+      //});
     } catch (error) {
       console.error(error);
       setGeneratedContent("Terjadi kesalahan saat membuat konten.");
@@ -144,43 +141,50 @@ export function ContentCreation() {
   };
 
   return (
-    <div className="flex h-full">
-      {/* 🧩 Form Input - Left Side */}
-      <div className="w-1/3 p-6 border-r bg-card">
-        <Card>
+    <div className="flex min-h-screen bg-background text-text-secondary">
+      {/* 🧩 Sidebar Form */}
+      <div className="w-1/3 p-6 border-r border-border-dark bg-surface/50 backdrop-blur-md">
+        <Card className="bg-surface border border-border-light hover:border-accent transition-all duration-300 rounded-xl shadow-accent/10">
           <CardHeader>
-            <CardTitle>Buat Konten Baru</CardTitle>
+            <CardTitle className="text-lg font-semibold text-text-primary">
+              Buat Konten Baru
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Form Fields */}
+
+          <CardContent className="space-y-5">
+            {/* Topic */}
             <div className="space-y-2">
-              <Label>Topik</Label>
+              <Label className="text-text-muted">Topik</Label>
               <Input
                 placeholder="Masukkan topik konten..."
+                className="bg-surface-alt border-border-light focus:border-accent focus:ring-0"
                 value={formData.topic}
                 onChange={(e) => handleInputChange("topic", e.target.value)}
               />
             </div>
 
+            {/* Keywords */}
             <div className="space-y-2">
-              <Label>Kata Kunci</Label>
+              <Label className="text-text-muted">Kata Kunci</Label>
               <Input
                 placeholder="Kata kunci dipisahkan koma..."
+                className="bg-surface-alt border-border-light focus:border-accent"
                 value={formData.keywords}
                 onChange={(e) => handleInputChange("keywords", e.target.value)}
               />
             </div>
 
+            {/* Tone */}
             <div className="space-y-2">
-              <Label>Tone</Label>
+              <Label className="text-text-muted">Tone</Label>
               <Select
                 value={formData.tone}
                 onValueChange={(v) => handleInputChange("tone", v)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-surface-alt border-border-light focus:border-accent">
                   <SelectValue placeholder="Pilih tone konten" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-surface border-border-dark text-text-secondary">
                   <SelectItem value="formal">Formal</SelectItem>
                   <SelectItem value="casual">Casual</SelectItem>
                   <SelectItem value="friendly">Friendly</SelectItem>
@@ -190,33 +194,35 @@ export function ContentCreation() {
               </Select>
             </div>
 
+            {/* Category */}
             <div className="space-y-2">
-              <Label>Kategori</Label>
+              <Label className="text-text-muted">Kategori</Label>
               <Select
                 value={formData.category}
                 onValueChange={(v) => handleInputChange("category", v)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-surface-alt border-border-light focus:border-accent">
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-surface border-border-dark text-text-secondary">
                   <SelectItem value="AI Education">AI Education</SelectItem>
                   <SelectItem value="AI Sales">AI Sales</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Content Type */}
             {formData.category && (
               <div className="space-y-2">
-                <Label>Jenis Konten</Label>
+                <Label className="text-text-muted">Jenis Konten</Label>
                 <Select
                   value={formData.contentType}
                   onValueChange={(v) => handleInputChange("contentType", v)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-surface-alt border-border-light focus:border-accent">
                     <SelectValue placeholder="Pilih jenis konten" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-surface border-border-dark text-text-secondary">
                     {contentOptions[formData.category].map((t) => (
                       <SelectItem key={t} value={t}>
                         {t}
@@ -227,16 +233,17 @@ export function ContentCreation() {
               </div>
             )}
 
+            {/* Length */}
             <div className="space-y-2">
-              <Label>Panjang Konten</Label>
+              <Label className="text-text-muted">Panjang Konten</Label>
               <Select
                 value={formData.length}
                 onValueChange={(v) => handleInputChange("length", v)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-surface-alt border-border-light focus:border-accent">
                   <SelectValue placeholder="Pilih panjang konten" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-surface border-border-dark text-text-secondary">
                   <SelectItem value="short">Pendek (100–300 kata)</SelectItem>
                   <SelectItem value="medium">Sedang (300–600 kata)</SelectItem>
                   <SelectItem value="long">Panjang (600–1000 kata)</SelectItem>
@@ -249,8 +256,8 @@ export function ContentCreation() {
 
             <Button
               onClick={handleGenerate}
-              className="w-full"
               disabled={isGenerating || !formData.topic}
+              className="w-full bg-accent hover:bg-accent-hover transition-all duration-200"
             >
               {isGenerating ? (
                 <>
@@ -264,20 +271,37 @@ export function ContentCreation() {
         </Card>
       </div>
 
-      {/* 📄 Output - Right Side */}
+      {/* 📄 Output Panel */}
       <div className="flex-1 p-6">
-        <Card className="h-full">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Hasil Konten</CardTitle>
+        <Card className="h-full bg-surface border border-border-light rounded-xl hover:border-accent transition-all duration-300 shadow-accent/10 backdrop-blur-md">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-border-light pb-3">
+            <CardTitle className="text-lg text-text-primary">
+              Hasil Konten
+            </CardTitle>
             {generatedContent && (
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={copyToClipboard}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyToClipboard}
+                  className="border-border-light hover:border-accent hover:bg-active/20"
+                >
                   <Copy className="h-4 w-4 mr-2" /> Copy
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownload}
+                  className="border-border-light hover:border-accent hover:bg-active/20"
+                >
                   <Download className="h-4 w-4 mr-2" /> Download
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleGenerate}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerate}
+                  className="border-border-light hover:border-accent hover:bg-active/20"
+                >
                   <RefreshCw className="h-4 w-4 mr-2" /> Regenerate
                 </Button>
               </div>
@@ -287,17 +311,20 @@ export function ContentCreation() {
           <CardContent className="h-full">
             {generatedContent ? (
               <Textarea
-                className="w-full h-full min-h-[500px] resize-none font-mono"
+                className="w-full h-full min-h-[500px] resize-none font-mono bg-surface-alt text-text-secondary border-border-light focus:border-accent"
                 value={generatedContent}
                 onChange={(e) => setGeneratedContent(e.target.value)}
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
+              <div className="flex items-center justify-center h-full text-text-muted">
                 <div className="text-center">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-40 text-accent" />
                   <p>Konten yang dibuat AI akan muncul di sini</p>
-                  <p className="text-sm">
-                    Isi form di sebelah kiri dan klik "Generate Konten"
+                  <p className="text-sm text-text-muted">
+                    Isi form di sebelah kiri dan klik{" "}
+                    <span className="text-accent font-medium">
+                      Generate Konten
+                    </span>
                   </p>
                 </div>
               </div>

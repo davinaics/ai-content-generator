@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,51 +14,54 @@ export function History() {
       .catch((err) => console.error("Gagal mengambil data history:", err));
   }, []);
 
-  // 🔹 Fungsi buat bersihin markdown dan karakter aneh dari konten
   const cleanText = (text: string) => {
     return text
-      .replace(/\*\*/g, "") // hapus **bold**
-      .replace(/[#*_`~>|]/g, "") // hapus markdown simbol
-      .replace(/<\|.*?\|>/g, "") // hapus tag begin__of__sentence dll
-      .replace(/\n/g, " ") // ganti newline jadi spasi
+      .replace(/\*\*/g, "")
+      .replace(/[#*_`~>|]/g, "")
+      .replace(/<\|.*?\|>/g, "")
+      .replace(/\n/g, " ")
       .trim();
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Riwayat Konten</h1>
+    <div className="min-h-screen py-3 px-8 bg-background text-text-primary">
+      <div className="mx-auto space-y-8">
+        <h1 className="text-3xl font-bold tracking-tight text-accent border-b border-border-dark pb-3">
+          Riwayat Konten
+        </h1>
 
-      {history.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          Belum ada konten yang dibuat.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {history.map((item: any) => (
-            <Card
-              key={item.id}
-              className="cursor-pointer hover:shadow-md transition border border-gray-200"
-              onClick={() => navigate(`/history/${item.id}`)}
-            >
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">
-                  {item.topic || "Tanpa Judul"}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Clock className="h-4 w-4" />{" "}
-                  {new Date(item.created_at).toLocaleString()}
-                </p>
-              </CardHeader>
+        {history.length === 0 ? (
+          <p className="text-text-muted text-center text-sm">
+            Belum ada konten yang dibuat.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {history.map((item: any) => (
+              <Card
+                key={item.id}
+                className="cursor-pointer bg-surface border border-border-dark hover:border-accent-hover hover:shadow-shadow-accent transition-all duration-300 rounded-2xl"
+                onClick={() => navigate(`/history/${item.id}`)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-semibold text-text-primary line-clamp-1">
+                    {item.topic || "Tanpa Judul"}
+                  </CardTitle>
+                  <p className="text-xs text-text-secondary flex items-center gap-2 mt-1">
+                    <Clock className="h-4 w-4 text-accent" />{" "}
+                    {new Date(item.created_at).toLocaleString()}
+                  </p>
+                </CardHeader>
 
-              <CardContent>
-                <p className="line-clamp-2 text-sm text-muted-foreground">
-                  {cleanText(item.content).slice(0, 180)}...
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                <CardContent>
+                  <p className="line-clamp-3 text-sm text-text-secondary leading-relaxed">
+                    {cleanText(item.content).slice(0, 200)}...
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

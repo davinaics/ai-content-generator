@@ -3,14 +3,14 @@ import { Dashboard } from "./components/dashboard";
 import { ContentCreation } from "./components/content-creation";
 import { History } from "./components/history";
 import { HistoryDetail } from "./components/historydetail";
-import { Sidebar, SidebarProvider } from "./components/ui/sidebar";
+import { SidebarProvider } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 
 function App() {
   return (
     <SidebarProvider>
         <AppSidebar/>
-        <main className="w-full p-6">
+        <main className="w-full">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/buat" element={<ContentCreation />} />

@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Import dulu file warna agar variable siap dipakai */
+@import "./colors.css";
+
+/* Definisi theme global inline */
+@theme inline {
+  /* 🎨 Warna dasar */
+  --color-background: var(--color-bg-main);
+  --color-surface: var(--color-bg-surface);
+  --color-hover: var(--color-bg-hover);
+  --color-active: var(--color-bg-active);
+
+  /* Border */
+  --color-border-light: var(--color-border-light);
+  --color-border-dark: var(--color-border-dark);
+
+  /* Teks */
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+
+  /* Accent / Brand */
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+
+  /* Shadow */
+  --color-shadow-accent: var(--color-shadow-accent);
+
+  /* 🧠 Font default */
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+}

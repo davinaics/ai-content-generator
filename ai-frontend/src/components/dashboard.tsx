@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "@/components/ui/card";
 import { FileText, Clock, Users } from "lucide-react";
 
 export function Dashboard() {
@@ -27,7 +27,6 @@ export function Dashboard() {
     fetchHistory();
   }, []);
 
-  // === Hitung Statistik Dinamis ===
   const totalKonten = history.length;
   const hariIni = history.filter((item) => {
     const created = new Date(item.created_at);
@@ -38,14 +37,13 @@ export function Dashboard() {
       created.getFullYear() === now.getFullYear()
     );
   }).length;
-
   const kategoriUnik = new Set(history.map((item) => item.category)).size;
 
   const stats = [
     {
       title: "Total Konten",
       value: totalKonten,
-      description: "Konten yang telah dibuat",
+      description: "Semua konten yang telah dibuat",
       icon: FileText,
     },
     {
@@ -62,63 +60,78 @@ export function Dashboard() {
     },
   ];
 
-  // === Ambil 5 Aktivitas Terbaru ===
-  const recent = history.slice(0, 5);
+  const recent = history.slice(0, 3);
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Selamat datang di AI Content Generator. Lihat statistik dan aktivitas
-          terbaru Anda.
+    <div className="min-h-screen bg-background text-foreground p-8">
+      {/* Header */}
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-text-primary mb-2">
+          Dashboard
+        </h1>
+        <p className="text-text-muted">
+          Selamat datang di{" "}
+          <span className="text-accent font-semibold">
+            AI Content Generator
+          </span>
+          . Lihat statistik dan aktivitas terbaru kamu.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3 mb-8">
+      {/* Stats */}
+      <div className="grid gap-6 md:grid-cols-3 mb-10">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+          <Card
+            key={stat.title}
+            className="bg-surface border border-border text-foreground hover:border-accent/60 hover:shadow-accent/30 transition-all duration-300 backdrop-blur-md"
+          >
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-medium text-text-muted">
                 {stat.title}
               </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
+              <stat.icon className="size-5 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-4xl font-bold text-white">
                 {loading ? "..." : stat.value}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {stat.description}
-              </p>
+              <p className="text-xs text-text-muted mt-2">{stat.description}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card>
+      {/* Recent Activity */}
+      <Card className="bg-surface border border-border text-foreground backdrop-blur-md">
         <CardHeader>
-          <CardTitle>Aktivitas Terbaru</CardTitle>
-          <CardDescription>Konten yang baru saja dibuat</CardDescription>
+          <CardTitle className="text-lg font-semibold text-text-primary">
+            Aktivitas Terbaru
+          </CardTitle>
+          <CardDescription className="text-text-muted">
+            Konten terbaru yang telah dihasilkan
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-sm text-muted-foreground">Memuat data...</p>
+            <p className="text-sm text-text-muted">Memuat data...</p>
           ) : recent.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Belum ada konten yang dibuat.
-            </p>
+            <p className="text-sm text-text-muted">Belum ada konten yang dibuat.</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recent.map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{item.topic || "Tanpa Judul"}</p>
-                    <p className="text-sm text-muted-foreground">
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-card p-4 rounded-xl border border-border hover:border-accent/50 hover:bg-accent/10 transition-all duration-200"
+                >
+                  <div className="text-white">
+                    <p className="font-medium text-foreground">
+                      {item.topic || "Tanpa Judul"}
+                    </p>
+                    <p className="text-xs text-text-muted">
                       {new Date(item.created_at).toLocaleString("id-ID")}
                     </p>
                   </div>
-                  <span className="px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded">
+                  <span className="px-2 py-1 text-xs bg-accent text-white rounded-md shadow">
                     {item.content_type || "Konten"}
                   </span>
                 </div>

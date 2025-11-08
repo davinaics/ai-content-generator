@@ -1,0 +1,44 @@
+:root {
+  /* 🎨 Base colors */
+  --color-bg-main: #121212;
+  --color-bg-surface: #1e1e1e;
+  --color-bg-hover: #181818;
+  --color-bg-active: #550000;
+
+  /* Borders */
+  --color-border-light: #2a2a2a;
+  --color-border-dark: #2e2e2e;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #999999;
+
+  /* Accent (brand color) */
+  --color-accent: #c0392b;
+  --color-accent-hover: #550000;
+
+  /* Shadows & effects */
+  --color-shadow-accent: #55000055;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg-main: #fafafa;
+    --color-bg-surface: #ffffff;
+    --color-bg-hover: #f3f3f3;
+    --color-bg-active: #ffe5e5;
+
+    --color-border-light: #eaeaea;
+    --color-border-dark: #dddddd;
+
+    --color-text-primary: #111111;
+    --color-text-secondary: #444444;
+    --color-text-muted: #777777;
+
+    --color-accent: #c0392b;
+    --color-accent-hover: #a93226;
+
+    --color-shadow-accent: #c0392b33;
+  }
+}
