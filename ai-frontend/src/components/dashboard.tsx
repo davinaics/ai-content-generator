@@ -8,6 +8,36 @@ import {
 } from "@/components/ui/card";
 import { FileText, Clock, Users } from "lucide-react";
 
+// Helper: bikin judul jadi kapital tiap kata (kecuali kata kecil tertentu)
+const formatTitle = (text: string) => {
+  if (!text) return "";
+  const smallWords = [
+    "dan",
+    "di",
+    "ke",
+    "dari",
+    "yang",
+    "untuk",
+    "pada",
+    "dengan",
+    "atau",
+    "karena",
+    "dalam",
+  ];
+
+  return text
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word, index) => {
+      if (index !== 0 && smallWords.includes(word)) {
+        return word;
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+};
+
 export function Dashboard() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,38 +67,65 @@ export function Dashboard() {
       created.getFullYear() === now.getFullYear()
     );
   }).length;
-  const kategoriUnik = new Set(history.map((item) => item.category)).size;
+
+  const kategoriUnik = new Set(
+    history.filter((item) => item.content_type).map((item) => item.content_type)
+  ).size;
 
   const stats = [
     {
       title: "Total Konten",
       value: totalKonten,
-      description: "Semua konten yang telah dibuat",
+      description: "Total konten yang telah dibuat",
       icon: FileText,
     },
     {
       title: "Hari Ini",
       value: hariIni,
-      description: "Konten baru hari ini",
+      description: "Total konten baru",
       icon: Clock,
     },
     {
       title: "Kategori",
       value: kategoriUnik,
-      description: "Kategori konten berbeda",
+      description: "Total kategori konten berbeda yang pernah dibuat",
       icon: Users,
     },
   ];
 
-  const recent = history.slice(0, 3);
+  // 3 konten terbaru
+  const recent = history
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    .slice(0, 3);
+
+  // warna badge (sama dengan History.tsx)
+  const getBadgeClasses = (category: string) => {
+    const c = (category || "").toLowerCase();
+
+    if (c.includes("education") || c.includes("edukasi")) {
+      return "bg-emerald-900/60 text-emerald-300";
+    }
+
+    if (
+      c.includes("sales") ||
+      c.includes("marketing") ||
+      c.includes("copywriting")
+    ) {
+      return "bg-orange-900/60 text-orange-300";
+    }
+
+    return "bg-accent/15 text-accent";
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">
-          Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold text-text-primary mb-2">Dashboard</h1>
         <p className="text-text-muted">
           Selamat datang di{" "}
           <span className="text-accent font-semibold">
@@ -92,7 +149,7 @@ export function Dashboard() {
               <stat.icon className="size-5 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-white">
+              <div className="text-4xl font-bold text-accent">
                 {loading ? "..." : stat.value}
               </div>
               <p className="text-xs text-text-muted mt-2">{stat.description}</p>
@@ -103,19 +160,36 @@ export function Dashboard() {
 
       {/* Recent Activity */}
       <Card className="bg-surface border border-border text-foreground backdrop-blur-md">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-text-primary">
-            Aktivitas Terbaru
-          </CardTitle>
-          <CardDescription className="text-text-muted">
-            Konten terbaru yang telah dihasilkan
-          </CardDescription>
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold text-text-primary">
+              Aktivitas Terbaru
+            </CardTitle>
+            <CardDescription className="text-text-muted">
+              Konten terbaru yang telah dihasilkan
+            </CardDescription>
+          </div>
+
+          {/* Legend warna */}
+          <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-emerald-900/80 border border-emerald-400/60" />
+              <span>Education</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-orange-900/80 border border-orange-400/60" />
+              <span>Sales</span>
+            </div>
+          </div>
         </CardHeader>
+
         <CardContent>
           {loading ? (
             <p className="text-sm text-text-muted">Memuat data...</p>
           ) : recent.length === 0 ? (
-            <p className="text-sm text-text-muted">Belum ada konten yang dibuat.</p>
+            <p className="text-sm text-text-muted">
+              Belum ada konten yang dibuat.
+            </p>
           ) : (
             <div className="space-y-3">
               {recent.map((item, index) => (
@@ -125,15 +199,22 @@ export function Dashboard() {
                 >
                   <div className="text-white">
                     <p className="font-medium text-foreground">
-                      {item.topic || "Tanpa Judul"}
+                      {formatTitle(item.topic || "Tanpa Judul")}
                     </p>
                     <p className="text-xs text-text-muted">
                       {new Date(item.created_at).toLocaleString("id-ID")}
                     </p>
                   </div>
-                  <span className="px-2 py-1 text-xs bg-accent text-white rounded-md shadow">
-                    {item.content_type || "Konten"}
-                  </span>
+                  {item.content_type && (
+                    <span
+                      className={
+                        "px-3 py-1 text-xs rounded-md shadow " +
+                        getBadgeClasses(item.category || "")
+                      }
+                    >
+                      {item.content_type}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

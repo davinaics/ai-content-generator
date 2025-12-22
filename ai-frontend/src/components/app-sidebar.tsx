@@ -17,14 +17,22 @@ export function AppSidebar() {
   return (
     <Sidebar className="bg-surface text-text-secondary border-r border-border-dark">
       <SidebarContent>
-        {/* Header */}
-        <div className="flex items-center gap-2.5 p-5 border-b border-border-light">
-          <Sparkles className="w-6 h-6 text-accent" />
-          <h1 className="text-lg font-bold tracking-wide text-text-primary">
-            AI Content Generator
-          </h1>
+        {/* Header + Subjudul */}
+        <div className="border-b border-border-light p-5 space-y-2">
+          <div className="flex items-center gap-2.5">
+            <Sparkles className="w-6 h-6 text-accent" />
+            <h1 className="text-lg font-bold tracking-wide text-text-primary">
+              AI Content Generator
+            </h1>
+          </div>
+          <p className="text-xs leading-relaxed text-text-secondary">
+            Buat konten lebih cepat dan lebih mudah. Cocok untuk kebutuhan
+            edukasi, promosi, dan copywriting. Saat ini belum mendukung
+            pembuatan konten gambar.
+          </p>
         </div>
 
+        {/* Menu */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-text-muted px-5 pt-5 text-xs uppercase tracking-wider">
             Menu

@@ -16,6 +16,8 @@ import { Loader2, Copy, Download, RefreshCw, FileText } from "lucide-react";
 export function ContentCreation() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const [rating, setRating] = useState<number | "">("");
+  const [feedback, setFeedback] = useState("");
   const [formData, setFormData] = useState({
     topic: "",
     keywords: "",
@@ -28,21 +30,21 @@ export function ContentCreation() {
   const contentOptions: Record<string, string[]> = {
     "AI Education": [
       "Materi Pembelajaran",
+      "Modul Belajar",
+      "Rangkuman Materi",
+      "Penjelasan Konsep Sulit",
       "Soal Latihan",
       "Kuis Interaktif",
       "Penugasan",
-      "Rangkuman Materi",
-      "Modul Belajar",
-      "Penjelasan Konsep Sulit",
     ],
     "AI Sales": [
+      "Copywriting Sosial Media",
       "Iklan Produk",
       "Brosur / Pamflet Promosi",
-      "Proposal Penawaran",
-      "Email Marketing",
-      "Surat Kontrak",
       "Deskripsi Produk",
-      "Copywriting Sosial Media",
+      "Email Marketing",
+      "Proposal Penawaran",
+      "Surat Kontrak",
     ],
   };
 
@@ -87,15 +89,9 @@ export function ContentCreation() {
       const content = cleanText(data.result || "Tidak ada hasil.");
       setGeneratedContent(content);
 
-      // await fetch("http://localhost:8000/history", {
-      //  method: "POST",
-      //  headers: { "Content-Type": "application/json" },
-      //  body: JSON.stringify({
-      //   topic: formData.topic,
-      //    content,
-      //    created_at: new Date().toISOString(),
-      //  }),
-      //});
+      // Reset feedback setiap kali generate ulang
+      setRating("");
+      setFeedback("");
     } catch (error) {
       console.error(error);
       setGeneratedContent("Terjadi kesalahan saat membuat konten.");
@@ -138,6 +134,26 @@ export function ContentCreation() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  // Teks dinamis berdasarkan skor rating
+  const getRatingHelperText = () => {
+    if (!rating) {
+      return "Beri penilaian untuk kualitas konten ini (1–10), lalu tuliskan 3 masukan singkat agar AI bisa memberikan jawaban yang lebih baik di permintaan berikutnya.";
+    }
+
+    const score = Number(rating);
+
+    if (score >= 1 && score <= 5) {
+      return "Sepertinya konten ini masih jauh dari harapan kamu. Tuliskan 3 hal utama yang perlu diperbaiki agar kualitas jawabannya bisa naik setidaknya menjadi 7/10. Misalnya: bagian mana yang kurang relevan, kurang lengkap, atau gaya bahasanya tidak sesuai.";
+    }
+
+    if (score >= 6 && score <= 8) {
+      return "Konten ini sudah lumayan, tapi masih bisa ditingkatkan. Tuliskan 3 saran perbaikan agar jawaban seperti ini bisa menjadi 9/10. Misalnya: bagian mana yang perlu diperdalam, contoh apa yang bisa ditambahkan, atau bagian mana yang perlu dibuat lebih runtut.";
+    }
+
+    // 9–10
+    return "Hampir sempurna! ✨ Tuliskan 3 masukan kecil agar jawaban seperti ini bisa menjadi 10/10 untuk kamu. Misalnya: penyesuaian gaya bahasa, struktur paragraf, atau detail tambahan yang masih kamu butuhkan.";
   };
 
   return (
@@ -222,7 +238,7 @@ export function ContentCreation() {
                   <SelectTrigger className="bg-surface-alt border-border-light focus:border-accent">
                     <SelectValue placeholder="Pilih jenis konten" />
                   </SelectTrigger>
-                  <SelectContent className="bg-surface border-border-dark text-text-secondary">
+                  <SelectContent className="bg-surface border-border-dark text-text-secondary max-h-64">
                     {contentOptions[formData.category].map((t) => (
                       <SelectItem key={t} value={t}>
                         {t}
@@ -271,9 +287,10 @@ export function ContentCreation() {
         </Card>
       </div>
 
-      {/* 📄 Output Panel */}
-      <div className="flex-1 p-6">
-        <Card className="h-full bg-surface border border-border-light rounded-xl hover:border-accent transition-all duration-300 shadow-accent/10 backdrop-blur-md">
+      {/* 📄 Panel kanan: hasil + feedback (dipisah card) */}
+      <div className="flex-1 p-6 space-y-4">
+        {/* Card Hasil Konten */}
+        <Card className="bg-surface border border-border-light rounded-xl hover:border-accent transition-all duration-300 shadow-accent/10 backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between border-b border-border-light pb-3">
             <CardTitle className="text-lg text-text-primary">
               Hasil Konten
@@ -308,15 +325,15 @@ export function ContentCreation() {
             )}
           </CardHeader>
 
-          <CardContent className="h-full">
+          <CardContent>
             {generatedContent ? (
               <Textarea
-                className="w-full h-full min-h-[500px] resize-none font-mono bg-surface-alt text-text-secondary border-border-light focus:border-accent"
+                className="w-full min-h-[360px] max-h-[60vh] overflow-auto resize-none font-mono bg-surface-alt text-text-secondary border-border-light focus:border-accent"
                 value={generatedContent}
                 onChange={(e) => setGeneratedContent(e.target.value)}
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-text-muted">
+              <div className="flex items-center justify-center h-[300px] text-text-muted">
                 <div className="text-center">
                   <FileText className="h-12 w-12 mx-auto mb-4 opacity-40 text-accent" />
                   <p>Konten yang dibuat AI akan muncul di sini</p>
@@ -331,6 +348,65 @@ export function ContentCreation() {
             )}
           </CardContent>
         </Card>
+
+        {/* Card Penilaian Konten (di bawah, hanya jika sudah ada konten) */}
+        {generatedContent && (
+          <Card className="bg-surface border border-border-light rounded-xl shadow-accent/10">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold text-text-primary">
+                    Penilaian Konten
+                  </CardTitle>
+                  <p className="text-xs text-text-muted mt-1">
+                    {getRatingHelperText()}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="rating" className="text-xs text-text-muted">
+                    Skor (1–10)
+                  </Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={rating}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "") {
+                        setRating("");
+                      } else {
+                        const n = Number(v);
+                        if (n >= 1 && n <= 10) {
+                          setRating(n);
+                        }
+                      }
+                    }}
+                    className="w-16 text-center bg-surface-alt border-border-light focus:border-accent focus:ring-0 text-text-primary"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-2">
+              <Label htmlFor="feedback" className="text-xs text-text-muted">
+                Tulis 3 poin masukan kamu di sini
+              </Label>
+              <Textarea
+                id="feedback"
+                rows={3}
+                className="bg-surface-alt border-border-light focus:border-accent text-text-secondary"
+                placeholder={`- Contoh: Tambahkan contoh praktis di bagian akhir
+- Contoh: Perjelas struktur langkah-langkah
+- Contoh: Sesuaikan gaya bahasa agar lebih santai`}
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

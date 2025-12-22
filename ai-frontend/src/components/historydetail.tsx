@@ -7,6 +7,36 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+// helper title case
+const formatTitle = (text: string) => {
+  if (!text) return "";
+  const smallWords = [
+    "dan",
+    "di",
+    "ke",
+    "dari",
+    "yang",
+    "untuk",
+    "pada",
+    "dengan",
+    "atau",
+    "karena",
+    "dalam",
+  ];
+
+  return text
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word, index) => {
+      if (index !== 0 && smallWords.includes(word)) {
+        return word;
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+};
+
 export function HistoryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -98,7 +128,7 @@ export function HistoryDetail() {
 
           <div className="flex flex-col gap-3 mt-4">
             <CardTitle className="text-3xl font-bold text-accent">
-              {item.topic || "Tanpa Judul"}
+              {formatTitle(item.topic || "Tanpa Judul")}
             </CardTitle>
             <p className="text-sm text-text-muted">
               {new Date(item.created_at).toLocaleString("id-ID", {
