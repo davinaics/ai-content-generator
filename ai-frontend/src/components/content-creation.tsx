@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Copy, Download, RefreshCw, FileText } from "lucide-react";
+import jsPDF from "jspdf";
+import PptxGenJS from "pptxgenjs";
 
 export function ContentCreation() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -57,18 +59,19 @@ export function ContentCreation() {
   };
 
   const handleGenerate = async () => {
-    if (!formData.topic) return;
+    if (isGenerating || !formData.topic) return;
+
     setIsGenerating(true);
 
     try {
       const prompt = `
-        Kategori: ${formData.category}.
-        Jenis konten: ${formData.contentType}.
-        Topik: ${formData.topic}.
-        Kata kunci: ${formData.keywords}.
-        Tone: ${formData.tone}.
-        Panjang: ${formData.length}.
-      `;
+      Kategori: ${formData.category}.
+      Jenis konten: ${formData.contentType}.
+      Topik: ${formData.topic}.
+      Kata kunci: ${formData.keywords}.
+      Tone: ${formData.tone}.
+      Panjang: ${formData.length}.
+    `;
 
       const response = await fetch("http://127.0.0.1:8000/generate", {
         method: "POST",
@@ -89,7 +92,6 @@ export function ContentCreation() {
       const content = cleanText(data.result || "Tidak ada hasil.");
       setGeneratedContent(content);
 
-      // Reset feedback setiap kali generate ulang
       setRating("");
       setFeedback("");
     } catch (error) {
@@ -117,23 +119,66 @@ export function ContentCreation() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownloadPDF = () => {
     if (!generatedContent) {
       alert("⚠️ Belum ada konten untuk diunduh.");
       return;
     }
 
-    const blob = new Blob([generatedContent], {
-      type: "text/plain;charset=utf-8",
+    const doc = new jsPDF();
+    const marginX = 15;
+    const marginY = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - marginX * 2;
+
+    doc.setFont("Times", "Normal");
+    doc.setFontSize(14);
+    doc.text(formData.topic || "Hasil Konten AI", marginX, marginY);
+
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(generatedContent, maxWidth);
+    doc.text(lines, marginX, marginY + 10);
+
+    doc.save(`${formData.topic || "hasil_konten"}.pdf`);
+  };
+
+  const handleDownloadPPT = async () => {
+    if (!generatedContent) {
+      alert("⚠️ Belum ada konten untuk diunduh.");
+      return;
+    }
+
+    const pptx = new PptxGenJS();
+
+    // Slide Judul
+    const titleSlide = pptx.addSlide();
+    titleSlide.addText(formData.topic || "AI Generated Content", {
+      x: 1,
+      y: 1.5,
+      fontSize: 28,
+      bold: true,
     });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${formData.topic || "hasil_konten"}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    // Pecah konten per paragraf → 1 slide
+    const paragraphs = generatedContent
+      .split("\n")
+      .filter((p) => p.trim() !== "");
+
+    paragraphs.forEach((text) => {
+      const slide = pptx.addSlide();
+      slide.addText(text, {
+        x: 0.8,
+        y: 0.8,
+        w: 8.5,
+        h: 4.5,
+        fontSize: 16,
+        wrap: true,
+      });
+    });
+
+    await pptx.writeFile({
+      fileName: `${formData.topic || "hasil_konten"}.pptx`,
+    });
   };
 
   // Teks dinamis berdasarkan skor rating
@@ -308,10 +353,18 @@ export function ContentCreation() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleDownload}
+                  onClick={handleDownloadPDF}
                   className="border-border-light hover:border-accent hover:bg-active/20"
                 >
-                  <Download className="h-4 w-4 mr-2" /> Download
+                  <Download className="h-4 w-4 mr-2" /> PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadPPT}
+                  className="border-border-light hover:border-accent hover:bg-active/20"
+                >
+                  <Download className="h-4 w-4 mr-2" /> PPT
                 </Button>
                 <Button
                   variant="outline"

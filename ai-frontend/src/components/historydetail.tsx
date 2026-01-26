@@ -6,6 +6,8 @@ import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import jsPDF from "jspdf";
+import PptxGenJS from "pptxgenjs";
 
 // helper title case
 const formatTitle = (text: string) => {
@@ -59,17 +61,60 @@ export function HistoryDetail() {
     alert("✅ Konten berhasil disalin!");
   };
 
-  const downloadContent = () => {
+  const downloadPDF = () => {
     if (!item?.content) return;
-    const blob = new Blob([item.content], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${item.topic || "konten_ai"}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    const doc = new jsPDF();
+    const marginX = 15;
+    const marginY = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - marginX * 2;
+
+    doc.setFont("Times", "Normal");
+    doc.setFontSize(16);
+    doc.text(formatTitle(item.topic || "Hasil Konten AI"), marginX, marginY);
+
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(item.content, maxWidth);
+    doc.text(lines, marginX, marginY + 12);
+
+    doc.save(`${item.topic || "konten_ai"}.pdf`);
+  };
+
+  const downloadPPT = async () => {
+    if (!item?.content) return;
+
+    const pptx = new PptxGenJS();
+
+    // Slide Judul
+    const titleSlide = pptx.addSlide();
+    titleSlide.addText(formatTitle(item.topic || "AI Generated Content"), {
+      x: 1,
+      y: 1.5,
+      fontSize: 28,
+      bold: true,
+    });
+
+    // 1 paragraf = 1 slide
+    const paragraphs = item.content
+      .split("\n")
+      .filter((p: string) => p.trim() !== "");
+
+    paragraphs.forEach((text: string) => {
+      const slide = pptx.addSlide();
+      slide.addText(text, {
+        x: 0.8,
+        y: 0.8,
+        w: 8.5,
+        h: 4.5,
+        fontSize: 16,
+        wrap: true,
+      });
+    });
+
+    await pptx.writeFile({
+      fileName: `${item.topic || "konten_ai"}.pptx`,
+    });
   };
 
   if (isLoading)
@@ -118,10 +163,18 @@ export function HistoryDetail() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={downloadContent}
-                className="border-border-dark text-text-secondary hover:bg-accent-hover hover:text-text-primary transition-all cursor-pointer"
+                onClick={downloadPDF}
+                className="border-border-dark text-text-secondary hover:bg-accent-hover hover:text-text-primary transition-all"
               >
-                <Download className="h-4 w-4 mr-2" /> Download
+                <Download className="h-4 w-4 mr-2" /> PDF
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadPPT}
+                className="border-border-dark text-text-secondary hover:bg-accent-hover hover:text-text-primary transition-all"
+              >
+                <Download className="h-4 w-4 mr-2" /> PPT
               </Button>
             </div>
           </div>
