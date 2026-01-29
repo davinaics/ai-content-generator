@@ -3,7 +3,7 @@
 A full-stack web application for generating AI-based written content using Large Language Models (LLMs).  
 This project consists of a **Next.js frontend** and a **FastAPI backend** integrated with **OpenRouter API** and **Supabase** for data storage.
 
-The application allows users to input prompts and generate AI-written content such as articles, captions, or product descriptions.
+The application allows users to input prompts and generate AI-written content for learning materials and marketing purposes, reducing production time from 2–3 days to under 1 hour. Examples include learning modules, practice questions, social media captions, and product descriptions.
 
 ---
 
