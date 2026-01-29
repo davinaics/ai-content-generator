@@ -128,13 +128,3 @@ Run Frontend:
 cd ai-forntend
 npm run dev
 ```
-
-
-
-
-
-
-
-
-## 🗂️ Project Structure
-
