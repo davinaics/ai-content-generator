@@ -52,7 +52,7 @@ ai-content-generator/
 
 ## 🛠️ Tech Stack
 
-### Backend
+### Backend:
 - Python  
 - FastAPI  
 - OpenRouter API (LLM)  
@@ -60,7 +60,7 @@ ai-content-generator/
 - Requests  
 - TOML  
 
-### Frontend
+### Frontend:
 - Next.js  
 - React  
 - Axios
@@ -118,13 +118,13 @@ anon_key = "YOUR_SUPABASE_ANON_KEY"
 ---
 
 ## ▶️ Running the Application
-Run Backend:
+### Run Backend:
 ```bash
 cd ai-backend
 uvicorn app3:app --reload
 ```
-Run Frontend:
+### Run Frontend:
 ```bash
-cd ai-forntend
+cd ai-frontend
 npm run dev
 ```
