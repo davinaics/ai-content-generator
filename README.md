@@ -101,6 +101,8 @@ cd ai-frontend
 npm install
 ```
 
+---
+
 ## 🔑 Configuration
 ```bash
 [openrouter]
@@ -112,6 +114,8 @@ model = "gpt-3.5-turbo"
 url = "YOUR_SUPABASE_URL"
 anon_key = "YOUR_SUPABASE_ANON_KEY"
 ```
+
+---
 
 ## ▶️ Running the Application
 Run Backend:
